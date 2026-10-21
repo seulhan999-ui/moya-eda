@@ -1,0 +1,85 @@
+/* Утверждённый стиль «Моя еда»: графит, крем и медь (макеты в папке «макеты»). */
+@import '@fontsource/prata/cyrillic-400.css';
+@import '@fontsource/prata/latin-400.css';
+@import '@fontsource/marck-script/cyrillic-400.css';
+@import '@fontsource/commissioner/cyrillic-400.css';
+@import '@fontsource/commissioner/cyrillic-500.css';
+@import '@fontsource/commissioner/cyrillic-600.css';
+@import '@fontsource/commissioner/latin-400.css';
+@import '@fontsource/commissioner/latin-600.css';
+
+:root {
+  --coal: #211e1e;
+  --coal-2: #2b2727;
+  --coal-3: #352f2e;
+  --cream: #f1ece2;
+  --copper: #c17a3e;
+  --copper-2: #d8955a;
+  --green: #8fc09a;
+  --red: #e3a39b;
+  --on2: rgba(241, 236, 226, 0.74);
+  --on3: rgba(241, 236, 226, 0.52);
+  --hair: rgba(241, 236, 226, 0.12);
+  --serif: 'Prata', Georgia, serif;
+  --script: 'Marck Script', cursive;
+  --sans: 'Commissioner', -apple-system, 'Segoe UI', sans-serif;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; }
+body {
+  background: var(--coal);
+  background-image: radial-gradient(520px 380px at 100% 0%, rgba(193, 122, 62, 0.14), transparent 60%);
+  background-attachment: fixed;
+  color: var(--cream);
+  font: 400 16px/1.45 var(--sans);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+
+.page { max-width: 520px; margin: 0 auto; padding: calc(16px + env(safe-area-inset-top)) 16px 40px; }
+.top { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; padding: 6px 4px 0; }
+.date { font: 21px/1 var(--script); color: var(--copper); white-space: nowrap; }
+h1 { font: 400 34px/1 var(--serif); letter-spacing: -0.02em; margin: 6px 0 0; white-space: nowrap; }
+.label { font-size: 13px; color: var(--on3); margin: 22px 4px 10px; display: flex; justify-content: space-between; gap: 8px; }
+
+.card { border-radius: 26px; background: var(--coal-2); border: 1px solid var(--hair); }
+.pad { padding: 16px; }
+.btn { min-height: 52px; border: 0; border-radius: 16px; font-size: 15px; font-weight: 600; padding: 0 18px; }
+.btn:disabled { opacity: 0.5; cursor: default; }
+.btn-cu { background: var(--copper); color: var(--coal); box-shadow: 0 14px 28px -14px rgba(193, 122, 62, 0.7); }
+.btn-ln { background: rgba(241, 236, 226, 0.03); border: 1px solid var(--hair); color: var(--cream); font-weight: 500; }
+.btn-full { width: 100%; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.field { display: block; margin-bottom: 12px; }
+.field span { display: block; font-size: 13px; color: var(--on3); margin: 0 4px 6px; }
+.input {
+  width: 100%; min-height: 54px; padding: 0 16px; border-radius: 16px;
+  border: 1px solid var(--hair); background: rgba(241, 236, 226, 0.04); color: var(--cream); font-size: 16px; outline: none;
+}
+.input:focus { border-color: rgba(216, 149, 90, 0.6); }
+
+.note { font-size: 13px; color: var(--on2); }
+.warn { font-size: 13px; color: var(--copper-2); }
+.err { font-size: 13px; color: var(--red); }
+
+.pill { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--on2); white-space: nowrap; }
+.pill::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--on3); }
+.pill.ok::before { background: #7fb08a; box-shadow: 0 0 0 4px rgba(127, 176, 138, 0.15); }
+.pill.wait::before { background: var(--copper); box-shadow: 0 0 0 4px rgba(193, 122, 62, 0.15); }
+.pill.bad::before { background: #d9837a; }
+
+.list-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--hair); }
+.list-row:last-child { border-bottom: 0; }
+.list-row b { font: 400 20px var(--serif); }
+.list-row .sub { font-size: 12.5px; color: var(--on3); }
+.grow { flex: 1; min-width: 0; }
+.x { width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--hair); background: none; color: var(--on2); }
+
+.brand { text-align: center; margin: 40px 0 24px; }
+.brand .script { font: 26px var(--script); color: var(--copper); }
+.brand h1 { font-size: 46px; }
