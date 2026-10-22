@@ -1,7 +1,8 @@
 // «Моя еда» — ИИ-помощник: прокси к GigaChat (Сбер) из Supabase Edge Function.
 // • Ключ GigaChat — только в секрете GIGACHAT_AUTH_KEY, в приложение не попадает.
-// • Отвечает только вошедшим пользователям, чья почта есть в секрете ASSISTANT_ALLOWED_EMAILS
-//   (через запятую) — чтобы посторонние не расходовали бесплатные токены.
+// • Отвечает только вошедшим пользователям. Почты из секрета ASSISTANT_ALLOWED_EMAILS (через запятую)
+//   — без ограничений; остальные (тестировщики) — не больше ASSISTANT_DAILY_LIMIT вопросов в день
+//   (по умолчанию 30; 0 — помощник только для списка).
 // • Функция сама ничего не меняет в данных: она передаёт GigaChat сообщения и описания функций
 //   приложения и возвращает ответ модели. Действия выполняет приложение (и спрашивает подтверждение).
 
@@ -87,15 +88,22 @@ Deno.serve(async (req) => {
   const auth = req.headers.get('Authorization') ?? '';
   const apikey = req.headers.get('apikey') ?? Deno.env.get('SUPABASE_ANON_KEY') ?? '';
   let email: string | undefined;
+  let userId: string | undefined;
   try {
     const u = await fetch(`${Deno.env.get('SUPABASE_URL')}/auth/v1/user`, { headers: { Authorization: auth, apikey } });
-    if (u.ok) email = String((await u.json()).email ?? '').toLowerCase() || undefined;
+    if (u.ok) {
+      const user = await u.json();
+      email = String(user.email ?? '').toLowerCase() || undefined;
+      userId = user.id;
+    }
   } catch {
     email = undefined;
   }
   if (!email) return json({ ok: false, error: 'auth', message: 'Войдите в приложение' }, 401);
   const allowed = (Deno.env.get('ASSISTANT_ALLOWED_EMAILS') ?? '').toLowerCase().split(',').map((s) => s.trim()).filter(Boolean);
-  if (!allowed.includes(email)) return json({ ok: false, error: 'not_allowed', message: 'Помощник не включён для этого аккаунта' }, 403);
+  const unlimited = allowed.includes(email);
+  const dailyLimit = Number(Deno.env.get('ASSISTANT_DAILY_LIMIT') ?? '30');
+  if (!unlimited && !(dailyLimit > 0)) return json({ ok: false, error: 'not_allowed', message: 'Помощник не включён для этого аккаунта' }, 403);
 
   // 2. Что спрашивают
   let body: { messages?: unknown[]; functions?: unknown[] };
@@ -106,6 +114,22 @@ Deno.serve(async (req) => {
   }
   const messages = Array.isArray(body.messages) ? body.messages.slice(-MAX_MESSAGES) : [];
   if (messages.length === 0) return json({ ok: false, error: 'empty' }, 400);
+
+  // Лимит считается по вопросам пользователя (второй вызов после функции приложения не считается).
+  const last = messages[messages.length - 1] as { role?: string };
+  if (!unlimited && last?.role === 'user') {
+    const service = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    if (!service || !userId) return json({ ok: false, error: 'not_allowed' }, 403);
+    const day = new Date(Date.now() + 7 * 3600_000).toISOString().slice(0, 10); // сутки по Красноярску
+    const hit = await fetch(`${Deno.env.get('SUPABASE_URL')}/rest/v1/rpc/assistant_hit`, {
+      method: 'POST',
+      headers: { apikey: service, Authorization: `Bearer ${service}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_owner: userId, p_day: day }),
+    });
+    const count = hit.ok ? Number(await hit.json()) : NaN;
+    if (!Number.isFinite(count)) return json({ ok: false, error: 'upstream', detail: `limit_check_${hit.status}` }, 502);
+    if (count > dailyLimit) return json({ ok: false, error: 'daily_limit', limit: dailyLimit }, 429);
+  }
 
   // 3. Ответ GigaChat
   try {
