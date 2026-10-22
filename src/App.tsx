@@ -50,7 +50,7 @@ export default function App() {
   if (!demo && !session) return <LoginScreen />;
   if (!sync || !userId) return null;
 
-  return <Screens sync={sync} userId={userId} email={session?.user.email ?? 'демо-режим'} tab={tab} setTab={setTab} />;
+  return <Screens sync={sync} userId={userId} email={demo ? 'демо-режим' : session?.user.email ?? ''} tab={tab} setTab={setTab} />;
 }
 
 function Screens({ sync, userId, email, tab, setTab }: { sync: SyncSession; userId: string; email: string; tab: ReturnType<typeof useTab>[0]; setTab: ReturnType<typeof useTab>[1] }) {

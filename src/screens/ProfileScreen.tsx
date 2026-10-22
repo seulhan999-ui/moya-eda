@@ -214,8 +214,11 @@ export function ProfileScreen({ session, owner, email }: { session: SyncSession;
       <BackupBlock session={session} toast={showToast} />
 
       <section className="card row-card" style={{ marginTop: 10 }}>
-        <div className="grow"><span className="note">Вы вошли как</span><div className="ellipsis">{email}</div></div>
-        <button className="btn btn-ln small-btn" onClick={() => void supabase.auth.signOut()}>Выйти</button>
+        <div className="grow"><span className="note">Вы вошли как</span><div className="ellipsis">{email || 'гость (тестовый вход)'}</div></div>
+        <button className="btn btn-ln small-btn" onClick={() => {
+          if (!email && !confirm('Вы вошли как гость. После выхода данные этого гостевого аккаунта будут недоступны. Выйти?')) return;
+          void supabase.auth.signOut();
+        }}>Выйти</button>
       </section>
       <p className="note small pad-x">Нормы: МР 2.3.1.0253-21 Роспотребнадзора. Состав продуктов: USDA FoodData Central. 3D-иконки: Microsoft Fluent Emoji (MIT).</p>
 

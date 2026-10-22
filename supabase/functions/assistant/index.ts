@@ -99,9 +99,9 @@ Deno.serve(async (req) => {
   } catch {
     email = undefined;
   }
-  if (!email) return json({ ok: false, error: 'auth', message: 'Войдите в приложение' }, 401);
+  if (!userId) return json({ ok: false, error: 'auth', message: 'Войдите в приложение' }, 401);
   const allowed = (Deno.env.get('ASSISTANT_ALLOWED_EMAILS') ?? '').toLowerCase().split(',').map((s) => s.trim()).filter(Boolean);
-  const unlimited = allowed.includes(email);
+  const unlimited = !!email && allowed.includes(email);
   const dailyLimit = Number(Deno.env.get('ASSISTANT_DAILY_LIMIT') ?? '30');
   if (!unlimited && !(dailyLimit > 0)) return json({ ok: false, error: 'not_allowed', message: 'Помощник не включён для этого аккаунта' }, 403);
 
