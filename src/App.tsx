@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { startDemo, startSync, supabase, type SyncSession } from './data/client';
 import { LoginScreen } from './screens/LoginScreen';
+import { MenuScreen } from './screens/MenuScreen';
 import { ProfileScreen } from './screens/ProfileScreen';
 import { RecipesScreen } from './screens/RecipesScreen';
 import { SoonScreen } from './screens/SoonScreen';
@@ -54,10 +55,7 @@ export default function App() {
         <SoonScreen title="Сегодня" script="план и факт" icon="Sun" stage={6}
           items={['Ход дня и карточка «Сейчас» с кнопкой «Съел»', 'Замена и пропуск блюда, еда вне плана', '«Приготовил» — списание продуктов из запасов']} />
       )}
-      {tab === 'menu' && (
-        <SoonScreen title="Меню недели" script="план на 7 дней" icon="Spiral calendar" stage={4}
-          items={['Четыре режима питания', 'Три варианта меню на неделю', 'Закрепление и замена блюд, «Хочу новое»']} />
-      )}
+      {tab === 'menu' && <MenuScreen session={sync} owner={userId} onCart={() => setTab('cart')} />}
       {tab === 'cart' && (
         <SoonScreen title="Корзина" script="покупки и запасы" icon="Basket" stage={5}
           items={['Список покупок по отделам с упаковками', '«Куплено» с ценой из чека', 'Запасы «Есть дома» со сроками']} />
