@@ -9,14 +9,6 @@ export function LoginScreen() {
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ kind: 'err' | 'note'; text: string } | null>(null);
 
-  async function guest() {
-    setBusy(true);
-    setMsg(null);
-    const { error } = await supabase.auth.signInAnonymously();
-    if (error) setMsg({ kind: 'err', text: /anonymous/i.test(error.message) ? 'Гостевой вход пока выключен' : humanError(error.message) });
-    setBusy(false);
-  }
-
   async function submit(e: FormEvent) {
     e.preventDefault();
     setBusy(true);
@@ -68,12 +60,6 @@ export function LoginScreen() {
           {busy ? 'Подождите…' : mode === 'in' ? 'Войти' : 'Создать аккаунт'}
         </button>
       </form>
-      <button type="button" className="btn btn-ln btn-full" style={{ marginTop: 12 }} disabled={busy} onClick={() => void guest()}>
-        Попробовать без регистрации
-      </button>
-      <p className="note small" style={{ textAlign: 'center', margin: '8px 4px 0' }}>
-        Гостевой вход для знакомства с приложением. Данные гостя хранятся, пока вы не выйдете из аккаунта.
-      </p>
       <p className="note" style={{ textAlign: 'center', marginTop: 16 }}>
         {mode === 'in' ? 'Первый раз? ' : 'Уже есть аккаунт? '}
         <button type="button" className="btn-link" onClick={() => setMode(mode === 'in' ? 'up' : 'in')}
