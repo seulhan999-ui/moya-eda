@@ -2,3 +2,6 @@
 // защищён правилами RLS и входом пользователя. Секретные ключи сюда не кладутся.
 export const SUPABASE_URL = 'https://ezhwezpfpnabvdvyfwqb.supabase.co';
 export const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_YTfccrloLky0pplxFICtjQ_C182qv5H';
+
+/** Адрес (slug) функции ИИ-помощника в Supabase Edge Functions — так её назвал Supabase при размещении. */
+export const ASSISTANT_FUNCTION = 'smooth-processor';

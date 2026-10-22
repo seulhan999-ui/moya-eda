@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { MEAL_LABEL, RECIPE_MAP } from '../catalog';
 import { supabase } from '../data/client';
+import { ASSISTANT_FUNCTION } from '../config';
 import { Obj } from '../ui/kit';
 import { FUNCTIONS, resultForModel, runTool, systemPrompt, type ToolContext, type ToolResult } from './tools';
 import type { MealType } from '../core/types';
@@ -24,11 +25,11 @@ const ERRORS: Record<string, string> = {
   network: 'Не удалось связаться с GigaChat. Проверьте интернет и попробуйте ещё раз.',
   upstream: 'GigaChat сейчас не отвечает. Попробуйте чуть позже.',
   auth: 'Войдите в приложение заново.',
-  not_deployed: 'Помощник ещё не размещён в Supabase (нет функции assistant).',
+  not_deployed: 'Помощник ещё не размещён в Supabase.',
 };
 
 async function callAssistant(messages: ModelMsg[]): Promise<{ ok: true; content: string; function_call: { name: string; arguments: unknown } | null } | { ok: false; error: string }> {
-  const { data, error } = await supabase.functions.invoke('assistant', { body: { messages, functions: FUNCTIONS } });
+  const { data, error } = await supabase.functions.invoke(ASSISTANT_FUNCTION, { body: { messages, functions: FUNCTIONS } });
   if (error) {
     let code = 'network';
     try {
