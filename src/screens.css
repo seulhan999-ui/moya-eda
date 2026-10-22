@@ -299,7 +299,7 @@ select.input { appearance: none; -webkit-appearance: none; }
 .bubble { max-width: 92%; padding: 10px 14px; border-radius: 18px; font-size: 15px; }
 .bubble p { margin: 0; }
 .bubble.me { align-self: flex-end; background: var(--copper); color: var(--coal); border-bottom-right-radius: 6px; }
-.bubble.ai { align-self: flex-start; background: var(--coal-3); border: 1px solid var(--hair); border-bottom-left-radius: 6px; }
+.bubble.bot { align-self: flex-start; background: var(--coal-3); border: 1px solid var(--hair); border-bottom-left-radius: 6px; }
 .ai-cards { margin-top: 8px; display: grid; gap: 6px; }
 .ai-cards .alt-opt { margin-top: 0; }
 .typing { display: flex; gap: 5px; }

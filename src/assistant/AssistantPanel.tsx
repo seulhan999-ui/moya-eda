@@ -3,7 +3,7 @@ import { MEAL_LABEL, RECIPE_MAP } from '../catalog';
 import { supabase } from '../data/client';
 import { ASSISTANT_FUNCTION } from '../config';
 import { Obj } from '../ui/kit';
-import { FUNCTIONS, resultForModel, runTool, systemPrompt, type ToolContext, type ToolResult } from './tools';
+import { FUNCTIONS, recipesText, resultForModel, runTool, systemPrompt, type ToolContext, type ToolResult } from './tools';
 import type { MealType } from '../core/types';
 
 type ModelMsg = { role: 'system' | 'user' | 'assistant' | 'function'; content: string; name?: string; function_call?: { name: string; arguments: unknown } };
@@ -84,6 +84,14 @@ export function AssistantPanel({ ctx, today, todayMeals, exclusions, onOpenRecip
       if (r1.function_call) {
         result = runTool(r1.function_call.name, r1.function_call.arguments, ctx);
         msgs = [...msgs, { role: 'assistant', content: '', function_call: r1.function_call }, { role: 'function', name: r1.function_call.name, content: resultForModel(result) }];
+        if (result.kind === 'recipes') {
+          // Про блюда отвечает само приложение: модель не должна называть блюда не из каталога.
+          answer = recipesText(result, r1.function_call.arguments);
+          msgs = [...msgs, { role: 'assistant', content: answer }];
+          setHistory(msgs.slice(1).slice(-10));
+          setBubbles((b) => [...b, { who: 'ai', text: answer, result }]);
+          return;
+        }
         const r2 = await callAssistant(msgs);
         answer = r2.ok && r2.content ? r2.content : defaultText(result);
         if (r2.ok) msgs = [...msgs, { role: 'assistant', content: answer }];
@@ -114,12 +122,12 @@ export function AssistantPanel({ ctx, today, todayMeals, exclusions, onOpenRecip
 
       <div className="ai-list">
         {bubbles.map((b, i) => (
-          <div key={i} className={`bubble ${b.who}`}>
+          <div key={i} className={`bubble ${b.who === 'me' ? 'me' : 'bot'}`}>
             <p>{b.text}</p>
             {b.result && <ResultView r={b.result} done={b.done} onRecipe={onOpenRecipe} onCart={onOpenCart} onConfirm={(m, s) => void confirm(i, m, s)} onCancel={() => setBubbles((bb) => bb.map((x, k) => (k === i ? { ...x, done: 'no' } : x)))} />}
           </div>
         ))}
-        {busy && <div className="bubble ai typing"><span /><span /><span /></div>}
+        {busy && <div className="bubble bot typing"><span /><span /><span /></div>}
         <div ref={endRef} />
       </div>
 

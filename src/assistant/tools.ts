@@ -80,8 +80,8 @@ export function runTool(name: string, rawArgs: unknown, ctx: ToolContext): ToolR
     case 'find_recipes': {
       const allowed = ctx.recipes.filter((r) => !ctx.never.has(r.id) && !r.ingredients.some((ri) => ctx.exclude.has(ri.ingredientId)));
       let list = allowed;
-      const q = typeof args.query === 'string' ? args.query : '';
-      if (q.trim()) list = list.filter((r) => matchesQuery(r, q));
+      const q = usefulQuery(typeof args.query === 'string' ? args.query : '', allowed);
+      if (q) list = list.filter((r) => matchesQuery(r, q));
       const max = Number(args.max_minutes);
       if (max > 0) list = list.filter((r) => r.timeTotalMin <= max);
       if (typeof args.meal_type === 'string' && MEALS.includes(args.meal_type)) list = list.filter((r) => r.mealTypes.includes(args.meal_type as MealType));
@@ -123,6 +123,24 @@ export function runTool(name: string, rawArgs: unknown, ctx: ToolContext): ToolR
   }
 }
 
+/** Оставить только слова запроса, которые встречаются хотя бы в одном блюде каталога. */
+function usefulQuery(q: string, recipes: Recipe[]): string {
+  return q
+    .split(/[\s,]+/)
+    .filter((w) => w.trim() && recipes.some((r) => matchesQuery(r, w)))
+    .join(' ');
+}
+
+/** Текст ответа про блюда формирует приложение — модель не может назвать блюдо не из каталога. */
+export function recipesText(r: Extract<ToolResult, { kind: 'recipes' }>, args: unknown): string {
+  const a = (typeof args === 'string' ? safeParse(args) : args ?? {}) as Record<string, unknown>;
+  if (!r.items.length) return r.note ?? 'Подходящих блюд не нашлось.';
+  if (a.from_stock) return r.note ?? 'Вот что можно приготовить из того, что есть дома:';
+  if (a.unusual) return 'Вот что вы ещё не пробовали:';
+  if (Number(a.max_minutes) > 0) return `Вот что можно приготовить не дольше ${Number(a.max_minutes)} минут:`;
+  return 'Вот что подходит:';
+}
+
 function safeParse(s: string): unknown {
   try {
     return JSON.parse(s);
@@ -148,7 +166,8 @@ export function systemPrompt(today: string, todayMeals: string, exclusions: stri
     `Сегодня ${today}. Приёмы пищи сегодня: ${todayMeals || 'меню на сегодня не выбрано'}.`,
     exclusions.length ? `Исключённые продукты пользователя: ${exclusions.join(', ')}.` : '',
     'Правила: отвечай по-русски, коротко и дружелюбно (1–3 предложения).',
-    'Для любых блюд, продуктов, покупок и отметок вызывай функции приложения и опирайся только на их результат.',
+    'Чтобы предложить блюдо, всегда вызывай find_recipes; сам блюда не называй. В query пиши только продукты или названия блюд, без слов «вкусное», «быстро».',
+    'Для покупок, экономии и отметок вызывай функции приложения и опирайся только на их результат.',
     'Никогда не придумывай цены, калории, наличие продуктов и рецепты — если данных нет, так и скажи.',
     'Если пользователь говорит, что пропустил или съел приём пищи, вызови mark_meal — приложение спросит подтверждение.',
     'Не давай медицинских назначений.',

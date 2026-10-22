@@ -69,3 +69,17 @@ describe('AC21 — шесть запросов помощника (исполн�
     expect(runTool('buy_everything', {}, ctx()).kind).toBe('error');
   });
 });
+
+describe('Устойчивость к формулировкам модели', () => {
+  it('общие слова в запросе («вкусное», «быстро») не обнуляют выдачу', () => {
+    const r = runTool('find_recipes', { query: 'вкусное быстро', max_minutes: 10 }, ctx());
+    if (r.kind !== 'recipes') throw new Error();
+    expect(r.items.length).toBeGreaterThan(0);
+    for (const i of r.items) expect(i.minutes).toBeLessThanOrEqual(10);
+  });
+  it('время строкой тоже понимается', () => {
+    const r = runTool('find_recipes', '{"max_minutes":"10"}', ctx());
+    if (r.kind !== 'recipes') throw new Error();
+    expect(r.items.length).toBeGreaterThan(0);
+  });
+});
