@@ -6,7 +6,7 @@ import { LoginScreen } from './screens/LoginScreen';
 import { MenuScreen } from './screens/MenuScreen';
 import { ProfileScreen } from './screens/ProfileScreen';
 import { RecipesScreen } from './screens/RecipesScreen';
-import { SoonScreen } from './screens/SoonScreen';
+import { TodayScreen } from './screens/TodayScreen';
 import { Shell, useTab } from './ui/Shell';
 
 export default function App() {
@@ -52,10 +52,7 @@ export default function App() {
     <Shell tab={tab} onTab={setTab}>
       {tab === 'recipes' && <RecipesScreen session={sync} owner={userId} />}
       {tab === 'profile' && <ProfileScreen session={sync} owner={userId} email={session?.user.email ?? 'демо-режим'} />}
-      {tab === 'today' && (
-        <SoonScreen title="Сегодня" script="план и факт" icon="Sun" stage={6}
-          items={['Ход дня и карточка «Сейчас» с кнопкой «Съел»', 'Замена и пропуск блюда, еда вне плана', '«Приготовил» — списание продуктов из запасов']} />
-      )}
+      {tab === 'today' && <TodayScreen session={sync} owner={userId} onMenu={() => setTab('menu')} />}
       {tab === 'menu' && <MenuScreen session={sync} owner={userId} onCart={() => setTab('cart')} />}
       {tab === 'cart' && <CartScreen session={sync} onMenu={() => setTab('menu')} />}
     </Shell>

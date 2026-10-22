@@ -13,7 +13,7 @@ export const TABS: { id: Tab; label: string; long: string; icon: string }[] = [
 
 function fromHash(): Tab {
   const h = location.hash.replace('#/', '') as Tab;
-  return TABS.some((t) => t.id === h) ? h : 'recipes';
+  return TABS.some((t) => t.id === h) ? h : 'today';
 }
 
 /** Текущий раздел хранится в адресе (#/recipes), чтобы «назад» в браузере работало. */

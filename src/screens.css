@@ -245,3 +245,47 @@ select.input { appearance: none; -webkit-appearance: none; }
 .exp { position: relative; font-size: 12px; color: var(--copper-2); margin-top: 2px; }
 .exp input { position: absolute; inset: 0; opacity: 0; width: 100%; }
 .chips.wrap { flex-wrap: wrap; overflow: visible; margin: 4px 0 0; padding: 0; }
+
+/* ===================== Сегодня ===================== */
+.daynav { display: flex; align-items: center; gap: 6px; }
+.daynav button { border: 0; background: none; color: var(--copper); font: 600 20px var(--sans); padding: 0 6px; min-height: 30px; }
+.steps-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 6px; margin-top: 18px; }
+.step { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 0 10px; border-radius: 18px; border: 1px solid transparent; background: none; font-size: 12px; color: var(--on3); }
+.step .s { display: flex; align-items: center; gap: 4px; }
+.step .s::before { content: ""; width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--on3); }
+.step.eaten, .step.replaced { color: var(--green); }
+.step.eaten .s::before, .step.replaced .s::before { background: var(--green); border-color: var(--green); }
+.step.skipped .s::before { border-style: dashed; }
+.step.cur { color: var(--cream); font-weight: 600; background: var(--coal-2); border-color: rgba(216, 149, 90, 0.4); }
+.step.cur .s::before { background: var(--copper); border-color: var(--copper); }
+.now { display: block; border-radius: 32px; padding: 18px; border: 1px solid rgba(216, 149, 90, 0.35);
+  background: radial-gradient(280px 230px at 50% 32%, rgba(216, 149, 90, 0.26), transparent 70%), linear-gradient(170deg, #3a3230, #262222);
+  box-shadow: 0 30px 50px -30px rgba(0, 0, 0, 0.85); }
+.now.done { display: grid; justify-items: center; text-align: center; gap: 6px; padding: 26px 18px; }
+.now.done b { font-size: 24px; }
+.now-head { display: flex; justify-content: space-between; align-items: center; font-size: 13.5px; color: var(--on2); }
+.now-head .pin { font-size: 12px; color: var(--copper-2); }
+.now-pic { display: block; margin: 4px auto 0; border: 0; background: none; padding: 0; }
+.now h2 { font: 400 25px/1.15 var(--serif); text-align: center; margin: 2px 0 6px; }
+.now .kc { text-align: center; font-size: 13.5px; color: var(--on2); }
+.now .kc.ok, .ok { color: var(--green); }
+.eat { width: 100%; min-height: 58px; margin-top: 18px; border: 0; border-radius: 18px; background: var(--copper); color: var(--coal); font-size: 17px; font-weight: 600; box-shadow: 0 14px 28px -12px rgba(193, 122, 62, 0.7); }
+.eat:active { transform: scale(0.98); }
+.sec-acts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.sec-acts button { min-height: 50px; border-radius: 16px; border: 1px solid var(--hair); background: rgba(241, 236, 226, 0.03); font-size: 14.5px; font-weight: 500; color: var(--cream); }
+.tip-card { display: flex; gap: 12px; margin-top: 14px; padding: 16px; border-radius: 24px; background: rgba(193, 122, 62, 0.1); border: 1px solid rgba(193, 122, 62, 0.3); }
+.tip-card b { display: block; font-size: 19px; margin-bottom: 4px; }
+.tip-card p { margin: 0 0 12px; font-size: 13.5px; color: var(--on2); }
+.row { width: 100%; display: flex; align-items: center; gap: 12px; padding: 10px 14px 10px 8px; border: 0; border-bottom: 1px solid var(--hair); background: none; text-align: left; color: var(--cream); }
+.row:last-child { border-bottom: 0; }
+.row .t { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.row .k { font-size: 12px; color: var(--on3); }
+.row b { font: 400 16.5px/1.2 var(--serif); margin-top: 2px; }
+.badge { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+.b-done { background: rgba(143, 192, 154, 0.16); color: var(--green); }
+.b-skip { background: rgba(241, 236, 226, 0.08); color: var(--on3); }
+.b-wait { color: var(--on3); font-weight: 500; }
+.b-out { background: rgba(193, 122, 62, 0.18); color: var(--copper-2); }
+.quick { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.q { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px 12px; border-radius: 22px; border: 1px solid var(--hair); background: var(--coal-2); font-size: 13px; color: var(--on2); text-align: center; line-height: 1.2; }
+.alt-opt.sel { border-color: rgba(216, 149, 90, 0.6); background: rgba(193, 122, 62, 0.12); }

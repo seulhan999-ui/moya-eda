@@ -28,6 +28,7 @@ export const TABLES = {
   taste_ratings: { pk: ['recipe_id'], mode: 'versioned', cursor: 'updated_at', conflict: 'owner,recipe_id' },
   weight_entries: { pk: ['id'], mode: 'versioned', cursor: 'updated_at', conflict: 'id' },
   import_jobs: { pk: ['id'], mode: 'versioned', cursor: 'updated_at', conflict: 'id' },
+  cook_batches: { pk: ['id'], mode: 'versioned', cursor: 'updated_at', conflict: 'id' },
 } as const satisfies Record<string, TableConfig>;
 
 export type TableName = keyof typeof TABLES;
