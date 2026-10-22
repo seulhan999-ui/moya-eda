@@ -115,7 +115,7 @@ function baseScore(r: Recipe, p: PlanInput, health: Map<string, { protein: numbe
   if (h && h.fiber >= 5) s += 0.5;
   if (h && h.protein >= 20 && !r.mealTypes.includes('snack')) s += 0.5;
   // Мягко сдерживаем перекос в белок (МР 2.3.1.0253-21: белки 12–14 % энергии).
-  if (h && h.kcal > 0) s -= Math.max(0, (h.protein * 4) / h.kcal - 0.25) * 6;
+  if (h && h.kcal > 0) s -= Math.max(0, (h.protein * 4) / h.kcal - 0.18) * 8;
   return s;
 }
 

@@ -165,7 +165,7 @@ describe('Энергия дня под норму', () => {
 });
 
 describe('Баланс при подгонке под норму', () => {
-  it('доля белка в среднем по неделе не выше 28 % энергии (защита от перекоса; цель МР — 12–14 %)', () => {
+  it('доля белка в среднем по неделе не выше 23 % энергии (защита от перекоса; цель МР — 12–14 %)', () => {
     for (const seed of [1, 7, 42]) {
       const { variants } = planWeek(input({ targetKcal: 2400, seed }));
       for (const v of variants) {
@@ -175,7 +175,7 @@ describe('Баланс при подгонке под норму', () => {
           kcal += t.kcal.value ?? 0;
           protein += t.protein.value ?? 0;
         }
-        expect((protein * 4) / kcal).toBeLessThan(0.28);
+        expect((protein * 4) / kcal).toBeLessThan(0.23);
         expect(kcal / 7).toBeGreaterThan(2400 * 0.8);
       }
     }

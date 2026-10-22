@@ -379,6 +379,105 @@ const SPECS: Spec[] = [
     steps: ['Прогрейте овощи в микроволновке 3 минуты.', 'Залейте взбитыми яйцами, посыпьте сыром.', 'Готовьте ещё 2–3 минуты.'],
   },
 
+  // ================= КРУПЫ, БОБОВЫЕ, ОВОЩИ (добавлено по решению пользователя 22.10.2026) =================
+  {
+    id: 'rice_pumpkin_porridge', name: 'Рисовая каша с тыквой', icon: 'Jack-o-lantern',
+    modes: ['economy', 'tasty'], meals: ['breakfast'], eq: ['stove'], time: [30, 10], passive: '20 минут каша варится сама',
+    ing: [['rice', 50], ['pumpkin', 150], ['milk', 150], ['honey', 10]],
+    steps: ['Нарежьте тыкву мелкими кубиками, залейте 150 мл воды и варите 10 минут.', 'Добавьте промытый рис и молоко, варите на слабом огне 20 минут, помешивая.', 'Подавайте с мёдом.'],
+  },
+  {
+    id: 'oat_banana_pancakes', name: 'Овсяные оладьи с бананом', icon: 'Pancakes',
+    modes: ['tasty', 'economy'], meals: ['breakfast'], eq: ['stove'], time: [15, 15],
+    ing: [['oats', 50], ['banana', 100], ['egg', 1], ['milk', 50], ['sunflower_oil', 5], ['cinnamon']],
+    steps: ['Разомните банан вилкой, смешайте с яйцом, молоком и хлопьями.', 'Дайте постоять 5 минут.', 'Жарьте небольшие оладьи на чуть смазанной сковороде по 2 минуты с каждой стороны.'],
+  },
+  {
+    id: 'beans_tomato_toast', name: 'Тушёная фасоль в томате с хлебом', icon: 'Beans',
+    modes: ['economy', 'no_cook'], meals: ['breakfast', 'lunch'], eq: ['stove'], time: [15, 8],
+    ing: [['beans_white_can', 150], ['tomatoes_can', 150], ['onion', 30], ['bread_ww', 50], ['sunflower_oil', 5], ['paprika'], ['salt']],
+    steps: ['Обжарьте мелко нарезанный лук 3 минуты.', 'Добавьте фасоль, томаты и паприку, тушите 8 минут.', 'Подавайте с хлебом.'],
+  },
+  {
+    id: 'chickpea_pilaf', name: 'Плов с нутом и овощами', icon: 'Cooked rice',
+    modes: ['economy', 'tasty'], meals: ['lunch', 'dinner'], eq: ['stove'], time: [35, 10], passive: '25 минут готовится под крышкой',
+    ing: [['rice', 70], ['chickpeas_can', 80], ['carrot', 80], ['onion', 50], ['garlic', 5], ['sunflower_oil', 10], ['salt']],
+    steps: ['Обжарьте лук и морковь соломкой 5 минут.', 'Добавьте промытый рис, нут и целую дольку чеснока, залейте 150 мл горячей воды.', 'Готовьте под крышкой на слабом огне 25 минут, не перемешивая.'],
+  },
+  {
+    id: 'buckwheat_veg', name: 'Гречка с овощами по-домашнему', icon: 'Cooked rice',
+    modes: ['economy'], meals: ['lunch', 'dinner'], eq: ['stove'], time: [25, 10], passive: 'гречка варится 15 минут',
+    ing: [['buckwheat', 70], ['carrot', 60], ['onion', 40], ['bell_pepper', 75], ['tomato_paste', 15], ['sunflower_oil', 7], ['salt']],
+    steps: ['Сварите гречку — 15 минут.', 'Обжарьте лук, морковь и перец 7 минут, добавьте пасту и 2 ложки воды.', 'Смешайте с гречкой.'],
+  },
+  {
+    id: 'pasta_zucchini_beans', name: 'Паста с кабачком, томатами и фасолью', icon: 'Spaghetti',
+    modes: ['tasty', 'economy'], meals: ['lunch', 'dinner'], eq: ['stove'], time: [20, 12],
+    ing: [['pasta_wg', 80], ['zucchini', 150], ['tomatoes_can', 150], ['beans_white_can', 80], ['garlic', 5], ['olive_oil', 7], ['oregano'], ['salt']],
+    steps: ['Отварите пасту.', 'Обжарьте чеснок и кабачок 5 минут, добавьте томаты, фасоль и орегано, тушите 5 минут.', 'Смешайте с пастой.'],
+  },
+  {
+    id: 'veg_stew_peas', name: 'Овощное рагу с картофелем и горошком', icon: 'Pot of food',
+    modes: ['economy'], meals: ['lunch', 'dinner'], eq: ['stove'], time: [30, 10], passive: '20 минут тушится само',
+    ing: [['potato', 200], ['zucchini', 150], ['carrot', 60], ['peas_frozen', 80], ['onion', 40], ['sunflower_oil', 7], ['dill', 3], ['salt']],
+    steps: ['Обжарьте лук и морковь 3 минуты.', 'Добавьте кубики картофеля и кабачка, 100 мл воды, тушите под крышкой 15 минут.', 'Добавьте горошек на 5 минут, посыпьте укропом.'],
+  },
+  {
+    id: 'lentil_patties', name: 'Котлеты из красной чечевицы с салатом', icon: 'Shallow pan of food',
+    modes: ['economy', 'tasty'], meals: ['lunch', 'dinner'], eq: ['stove'], time: [35, 15], passive: 'чечевица варится 15 минут',
+    ing: [['lentils_red', 70], ['onion', 40], ['carrot', 50], ['oats', 20], ['sunflower_oil', 8], ['cucumber', 100], ['curry'], ['salt']],
+    steps: ['Сварите чечевицу в 150 мл воды до загустения — 15 минут.', 'Смешайте с обжаренными луком и тёртой морковью, хлопьями и карри.', 'Сформируйте котлеты, обжарьте по 3 минуты с каждой стороны. Подавайте с огурцом.'],
+  },
+  {
+    id: 'couscous_chickpea_moroccan', name: 'Кускус с нутом и курагой по-мароккански', icon: 'Cooked rice',
+    modes: ['tasty'], meals: ['lunch', 'dinner'], eq: ['stove'], time: [20, 10],
+    ing: [['couscous', 60], ['chickpeas_can', 80], ['carrot', 60], ['zucchini', 100], ['dried_apricots', 15], ['olive_oil', 7], ['curry'], ['salt']],
+    steps: ['Запарьте кускус кипятком на 5 минут.', 'Обжарьте морковь и кабачок с карри 6 минут, добавьте нут и нарезанную курагу.', 'Смешайте с кускусом.'],
+  },
+  {
+    id: 'potato_mushrooms', name: 'Картофель с грибами и луком', icon: 'Potato',
+    modes: ['economy'], meals: ['dinner'], eq: ['stove'], time: [30, 15],
+    ing: [['potato', 250], ['mushrooms', 150], ['onion', 50], ['sunflower_oil', 10], ['dill', 3], ['salt']],
+    steps: ['Нарежьте картофель брусочками, жарьте под крышкой 10 минут.', 'Добавьте лук и грибы, жарьте без крышки ещё 10 минут, помешивая.', 'Посыпьте укропом.'],
+    passive: 'жарится под крышкой, помешивать изредка',
+  },
+  {
+    id: 'bean_veg_soup', name: 'Фасолевый суп с овощами', icon: 'Steaming bowl',
+    modes: ['economy'], meals: ['lunch'], eq: ['stove'], time: [25, 10], passive: '15 минут суп варится сам',
+    ing: [['beans_red_can', 120], ['potato', 100], ['carrot', 50], ['onion', 30], ['tomatoes_can', 100], ['sunflower_oil', 5], ['parsley', 5], ['salt']],
+    steps: ['Обжарьте лук и морковь 3 минуты.', 'Добавьте картофель, томаты и 400 мл воды, варите 12 минут.', 'Добавьте фасоль на 3 минуты, посыпьте зеленью.'],
+  },
+  {
+    id: 'buckwheat_pumpkin_seeds', name: 'Гречка с печёной тыквой и семечками', icon: 'Jack-o-lantern',
+    modes: ['tasty', 'economy'], meals: ['dinner', 'lunch'], eq: ['stove'], time: [25, 10], passive: 'гречка варится 15 минут',
+    ing: [['buckwheat', 60], ['pumpkin', 200], ['onion', 30], ['sunflower_seeds', 10], ['sunflower_oil', 7], ['salt']],
+    steps: ['Сварите гречку — 15 минут.', 'Обжарьте лук и кубики тыквы до мягкости — 10 минут.', 'Смешайте с гречкой, посыпьте семечками.'],
+  },
+  {
+    id: 'pasta_broccoli_cheese', name: 'Макароны с брокколи и сыром', icon: 'Spaghetti',
+    modes: ['tasty'], meals: ['dinner', 'lunch'], eq: ['stove'], time: [15, 10],
+    ing: [['pasta', 80], ['broccoli', 150], ['cheese_hard', 20], ['garlic', 5], ['olive_oil', 5], ['salt']],
+    steps: ['Отварите макароны, за 4 минуты до готовности добавьте в кастрюлю брокколи.', 'Слейте воду, добавьте масло с чесноком.', 'Посыпьте тёртым сыром.'],
+  },
+  {
+    id: 'bulgur_corn_salad', name: 'Булгур с овощами и кукурузой', icon: 'Green salad',
+    modes: ['no_cook', 'economy'], meals: ['lunch'], eq: ['none'], time: [20, 7], passive: 'булгур запаривается 15 минут',
+    ing: [['bulgur', 70], ['corn_can', 60], ['bell_pepper', 75], ['cucumber', 80], ['tomato', 80], ['olive_oil', 10], ['lemon', 10], ['parsley', 5], ['salt']],
+    steps: ['Залейте булгур кипятком из чайника 1:2, накройте на 15 минут.', 'Нарежьте овощи и зелень.', 'Смешайте, заправьте маслом и лимонным соком.'],
+  },
+  {
+    id: 'hummus_bulgur_bowl', name: 'Боул с хумусом, булгуром и овощами', icon: 'Green salad',
+    modes: ['no_cook', 'tasty'], meals: ['lunch'], eq: ['none'], time: [20, 5], passive: 'булгур запаривается 15 минут',
+    ing: [['bulgur', 60], ['hummus', 50], ['cucumber', 100], ['tomato', 100], ['lettuce', 30], ['olive_oil', 5], ['salt']],
+    steps: ['Запарьте булгур кипятком из чайника на 15 минут.', 'Выложите в миску булгур, салат и нарезанные овощи.', 'Добавьте хумус и сбрызните маслом.'],
+  },
+  {
+    id: 'cabbage_carrot_apple_salad', name: 'Салат из капусты, моркови и яблока', icon: 'Leafy green',
+    modes: ['no_cook', 'economy'], meals: ['snack', 'lunch'], eq: ['none'], time: [7, 7],
+    ing: [['cabbage', 150], ['carrot', 60], ['apple', 100], ['corn_can', 50], ['sunflower_oil', 10], ['lemon', 5], ['salt']],
+    steps: ['Тонко нашинкуйте капусту и слегка помните её с солью.', 'Натрите морковь и яблоко.', 'Смешайте с кукурузой, заправьте маслом и лимонным соком.'],
+  },
+
   // ================= ПЕРЕКУСЫ И «ПОЧТИ БЕЗ ГОТОВКИ» =================
   {
     id: 'hummus_veg_sticks', name: 'Хумус с овощными палочками', icon: 'Carrot',
