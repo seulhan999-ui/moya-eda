@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
-import { startSync, supabase, type SyncSession } from './data/client';
+import { startDemo, startSync, supabase, type SyncSession } from './data/client';
 import { LoginScreen } from './screens/LoginScreen';
-import { SyncCheckScreen } from './screens/SyncCheckScreen';
+import { ProfileScreen } from './screens/ProfileScreen';
+import { RecipesScreen } from './screens/RecipesScreen';
+import { SoonScreen } from './screens/SoonScreen';
+import { Shell, useTab } from './ui/Shell';
 
 export default function App() {
   const [session, setSession] = useState<Session | null | undefined>(undefined);
   const [sync, setSync] = useState<SyncSession | null>(null);
+  const [tab, setTab] = useTab();
 
   useEffect(() => {
     void supabase.auth.getSession().then(({ data }) => setSession(data.session));
@@ -14,9 +18,14 @@ export default function App() {
     return () => data.subscription.unsubscribe();
   }, []);
 
-  const userId = session?.user.id;
+  const demo = import.meta.env.DEV && location.search.includes('demo');
+  const userId = demo ? 'demo-user' : session?.user.id;
   useEffect(() => {
     if (!userId) return;
+    if (demo) {
+      void startDemo().then(setSync);
+      return;
+    }
     let active: SyncSession | null = null;
     let cancelled = false;
     void startSync(userId).then((s) => {
@@ -31,10 +40,28 @@ export default function App() {
       active?.stop();
       setSync(null);
     };
-  }, [userId]);
+  }, [userId, demo]);
 
-  if (session === undefined) return null;
-  if (!session) return <LoginScreen />;
-  if (!sync) return null;
-  return <SyncCheckScreen session={sync} email={session.user.email ?? ''} />;
+  if (!demo && session === undefined) return null;
+  if (!demo && !session) return <LoginScreen />;
+  if (!sync || !userId) return null;
+
+  return (
+    <Shell tab={tab} onTab={setTab}>
+      {tab === 'recipes' && <RecipesScreen session={sync} owner={userId} />}
+      {tab === 'profile' && <ProfileScreen session={sync} owner={userId} email={session?.user.email ?? 'демо-режим'} />}
+      {tab === 'today' && (
+        <SoonScreen title="Сегодня" script="план и факт" icon="Sun" stage={6}
+          items={['Ход дня и карточка «Сейчас» с кнопкой «Съел»', 'Замена и пропуск блюда, еда вне плана', '«Приготовил» — списание продуктов из запасов']} />
+      )}
+      {tab === 'menu' && (
+        <SoonScreen title="Меню недели" script="план на 7 дней" icon="Spiral calendar" stage={4}
+          items={['Четыре режима питания', 'Три варианта меню на неделю', 'Закрепление и замена блюд, «Хочу новое»']} />
+      )}
+      {tab === 'cart' && (
+        <SoonScreen title="Корзина" script="покупки и запасы" icon="Basket" stage={5}
+          items={['Список покупок по отделам с упаковками', '«Куплено» с ценой из чека', 'Запасы «Есть дома» со сроками']} />
+      )}
+    </Shell>
+  );
 }

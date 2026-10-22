@@ -40,7 +40,7 @@ body {
 button, input, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
 
-.page { max-width: 520px; margin: 0 auto; padding: calc(16px + env(safe-area-inset-top)) 16px 40px; }
+.page { max-width: 520px; margin: 0 auto; padding: calc(28px + env(safe-area-inset-top)) 16px 40px; }
 .top { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; padding: 6px 4px 0; }
 .date { font: 21px/1 var(--script); color: var(--copper); white-space: nowrap; }
 h1 { font: 400 34px/1 var(--serif); letter-spacing: -0.02em; margin: 6px 0 0; white-space: nowrap; }

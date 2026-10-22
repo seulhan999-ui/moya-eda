@@ -3,7 +3,7 @@
 import { createClient, type RealtimeChannel } from '@supabase/supabase-js';
 import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from '../config';
 import { LocalDb } from './localdb';
-import { SupabaseRemote } from './remote';
+import { NetworkError, SupabaseRemote, type Remote } from './remote';
 import { SyncEngine } from './sync';
 import { TABLE_NAMES } from './tables';
 
@@ -63,6 +63,24 @@ export async function startSync(userId: string): Promise<SyncSession> {
       db.close();
     },
   };
+}
+
+/**
+ * Демо-режим только для разработки (адрес ?demo на localhost): локальные данные без сервера,
+ * чтобы проверять экраны без входа в настоящий аккаунт. В сборку для публикации не попадает.
+ */
+export async function startDemo(): Promise<SyncSession> {
+  const db = await LocalDb.open('moya-eda-demo');
+  const offline: Remote = {
+    insert: () => Promise.reject(new NetworkError('демо без сервера')),
+    updateIfVersion: () => Promise.reject(new NetworkError('демо без сервера')),
+    upsert: () => Promise.reject(new NetworkError('демо без сервера')),
+    get: () => Promise.reject(new NetworkError('демо без сервера')),
+    pullSince: () => Promise.reject(new NetworkError('демо без сервера')),
+  };
+  const engine = new SyncEngine(db, offline, 'demo-user');
+  await engine.refreshStatus();
+  return { engine, db, stop: () => db.close() };
 }
 
 /** После любого локального изменения — отправить как можно скорее. */

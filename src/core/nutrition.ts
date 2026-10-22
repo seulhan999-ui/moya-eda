@@ -50,6 +50,7 @@ export function recipeNutrition(
   let total = emptyTotals();
   for (const ri of recipe.ingredients) {
     const ing = ingredients.get(ri.ingredientId);
+    if (ing && ri.toTaste && ing.negligible) continue;
     if (!ing || ri.toTaste) {
       total = addNutrients(total, null);
       continue;

@@ -45,6 +45,8 @@ export interface Ingredient {
   density?: number;
   nutrientSource?: NutrientSource;
   nutrientRef?: string;
+  /** Специи и соль: «по вкусу» не делает итог неполным — их вклад пренебрежимо мал. */
+  negligible?: boolean;
 }
 
 export interface RecipeIngredient {
@@ -69,10 +71,18 @@ export interface Recipe {
   timeActiveMin: number;
   modes: DietMode[];
   mealTypes: MealType[];
-  equipment: string[];
+  equipment: Equipment[];
   source: string;
   verified: boolean;
+  /** 3D-иконка блюда (заглушка вместо фото, пока нет своего). */
+  icon?: string;
+  /** Пояснение к пассивному времени (настаивание, запекание). */
+  passive?: string;
+  /** Совет, как сделать дешевле. */
+  cheaper?: string;
 }
+
+export type Equipment = 'stove' | 'microwave' | 'oven' | 'blender' | 'none';
 
 export interface Package {
   ingredientId: string;
