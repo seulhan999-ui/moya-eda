@@ -289,3 +289,24 @@ select.input { appearance: none; -webkit-appearance: none; }
 .quick { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .q { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px 12px; border-radius: 22px; border: 1px solid var(--hair); background: var(--coal-2); font-size: 13px; color: var(--on2); text-align: center; line-height: 1.2; }
 .alt-opt.sel { border-color: rgba(216, 149, 90, 0.6); background: rgba(193, 122, 62, 0.12); }
+
+/* ===================== Помощник ===================== */
+.ai { display: flex; flex-direction: column; min-height: 60vh; }
+.ai-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.ai-head b { display: block; font-size: 22px; }
+.ai-hints { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 10px; }
+.ai-list { flex: 1; display: flex; flex-direction: column; gap: 10px; padding-bottom: 10px; }
+.bubble { max-width: 92%; padding: 10px 14px; border-radius: 18px; font-size: 15px; }
+.bubble p { margin: 0; }
+.bubble.me { align-self: flex-end; background: var(--copper); color: var(--coal); border-bottom-right-radius: 6px; }
+.bubble.ai { align-self: flex-start; background: var(--coal-3); border: 1px solid var(--hair); border-bottom-left-radius: 6px; }
+.ai-cards { margin-top: 8px; display: grid; gap: 6px; }
+.ai-cards .alt-opt { margin-top: 0; }
+.typing { display: flex; gap: 5px; }
+.typing span { width: 7px; height: 7px; border-radius: 50%; background: var(--on3); animation: blink 1.2s infinite; }
+.typing span:nth-child(2) { animation-delay: 0.2s; }
+.typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes blink { 50% { opacity: 0.25; } }
+.ai-input { position: sticky; bottom: 0; display: flex; gap: 8px; padding-top: 8px; background: #2a2525; }
+.ai-send { width: 54px; flex-shrink: 0; border: 0; border-radius: 16px; background: var(--copper); color: var(--coal); font-size: 20px; font-weight: 700; }
+.ai-send:disabled { opacity: 0.5; }

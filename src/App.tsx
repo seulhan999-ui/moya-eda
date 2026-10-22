@@ -52,7 +52,7 @@ export default function App() {
     <Shell tab={tab} onTab={setTab}>
       {tab === 'recipes' && <RecipesScreen session={sync} owner={userId} />}
       {tab === 'profile' && <ProfileScreen session={sync} owner={userId} email={session?.user.email ?? 'демо-режим'} />}
-      {tab === 'today' && <TodayScreen session={sync} owner={userId} onMenu={() => setTab('menu')} />}
+      {tab === 'today' && <TodayScreen session={sync} owner={userId} onMenu={() => setTab('menu')} onCart={() => setTab('cart')} />}
       {tab === 'menu' && <MenuScreen session={sync} owner={userId} onCart={() => setTab('cart')} />}
       {tab === 'cart' && <CartScreen session={sync} onMenu={() => setTab('menu')} />}
     </Shell>

@@ -12,6 +12,11 @@ import { nowIso, uuid } from '../data/ids';
 import type { Row } from '../data/tables';
 import { Obj, Sheet, useRows, useToast } from '../ui/kit';
 import { RecipeSheet } from './RecipeSheet';
+import { AssistantPanel } from '../assistant/AssistantPanel';
+import { latestPrices, packagesFor } from '../core/prices';
+import { buildShoppingList } from '../core/shopping';
+import { INGREDIENTS, PACK_SIZE } from '../catalog';
+import type { Unit } from '../core/types';
 import { toMovement } from './RecipesScreen';
 
 const ORDER: MealType[] = ['breakfast', 'lunch', 'snack', 'dinner'];
@@ -22,7 +27,7 @@ const snap = (id: string, p: number) => snapshot(recipeNutrition(RECIPE_MAP.get(
 
 type Ask = { slot: Slot; recipeId: string; status: 'eaten' | 'replaced'; portions: number };
 
-export function TodayScreen({ session, owner, onMenu }: { session: SyncSession; owner: string; onMenu: () => void }) {
+export function TodayScreen({ session, owner, onMenu, onCart }: { session: SyncSession; owner: string; onMenu: () => void; onCart: () => void }) {
   const { engine } = session;
   const [plans] = useRows(session, 'meal_plans');
   const [entryRows] = useRows(session, 'food_entries');
@@ -31,6 +36,10 @@ export function TodayScreen({ session, owner, onMenu }: { session: SyncSession; 
   const [profiles] = useRows(session, 'profiles');
   const [weights] = useRows(session, 'weight_entries');
   const [ratingRows] = useRows(session, 'taste_ratings');
+  const [prefs] = useRows(session, 'food_preferences');
+  const [manualRows] = useRows(session, 'shopping_manual');
+  const [priceRows] = useRows(session, 'store_prices');
+  const [aiOpen, setAiOpen] = useState(false);
   const [day, setDay] = useState(todayStr());
   const [focus, setFocus] = useState<MealType | null>(null);
   const [swapOpen, setSwapOpen] = useState(false);
@@ -57,6 +66,8 @@ export function TodayScreen({ session, owner, onMenu }: { session: SyncSession; 
   const slots = planDay ? [...planDay.meals].filter((m) => m.recipeId).sort((a, b) => ORDER.indexOf(a.type) - ORDER.indexOf(b.type)) : [];
 
   const statusOf = (t: MealType) => entryFor(entries, day, t);
+  const todayPlan = () => plans.find((p) => p.week_start === mondayOf(todayStr()))?.variants as { active?: Day[] | null } | undefined;
+  const todaySlots = () => (todayPlan()?.active?.find((d) => d.date === todayStr())?.meals ?? []).filter((m) => m.recipeId);
   const firstOpen = slots.find((s) => !statusOf(s.type));
   const cur = (focus && slots.find((s) => s.type === focus && !statusOf(s.type))) || firstOpen || null;
   const totals = dayTotals(entries, day);
@@ -269,7 +280,7 @@ export function TodayScreen({ session, owner, onMenu }: { session: SyncSession; 
       <section className="quick">
         <button className="q" onClick={() => setSheet('offplan')}><Obj name="Bento box" size={54} />Еда<br />вне плана</button>
         <button className="q" onClick={() => setSheet('cook')}><Obj name="Cooking" size={54} />Приготовил<br />заранее</button>
-        <button className="q" onClick={() => showToast('Помощник появится на этапе 7')}><Obj name="Speech balloon" size={54} />Спросить<br />помощника</button>
+        <button className="q" onClick={() => setAiOpen(true)}><Obj name="Speech balloon" size={54} />Спросить<br />помощника</button>
       </section>
       {incomplete && totals.kcal.value !== null && <p className="note small pad-x">≈ — итог неполный: у части записей нет данных о составе.</p>}
 
@@ -333,6 +344,35 @@ export function TodayScreen({ session, owner, onMenu }: { session: SyncSession; 
             planned={(doc?.active ?? []).filter((d) => d.date >= day).slice(0, 3).flatMap((d) => d.meals.map((m) => m.recipeId!)).filter(Boolean)}
             batches={batches.filter((b) => batchLeftover(b, entries) > 0)}
             onCook={(id, p) => void cookNow(id, p)}
+          />
+        )}
+      </Sheet>
+
+      <Sheet open={aiOpen} onClose={() => setAiOpen(false)}>
+        {aiOpen && (
+          <AssistantPanel
+            today={new Date(todayStr() + 'T12:00:00').toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' })}
+            todayMeals={todaySlots().map((s) => `${MEAL_LABEL[s.type]} — ${RECIPE_MAP.get(s.recipeId!)?.name} (${statusText(entryFor(entries, todayStr(), s.type)?.status)})`).join('; ')}
+            exclusions={prefs.filter((p) => p.kind === 'exclude').map((p) => String(p.label))}
+            ctx={{
+              recipes: RECIPES, ingredients: INGREDIENT_MAP, stock,
+              exclude: new Set(prefs.filter((p) => p.kind === 'exclude').map((p) => String(p.ingredient_id))),
+              never: new Set(ratingRows.filter((r) => r.never_suggest).map((r) => String(r.recipe_id))),
+              rated: new Set(ratingRows.filter((r) => r.rating).map((r) => String(r.recipe_id))),
+              weekRecipes: (todayPlan()?.active ?? []).flatMap((d) => d.meals.map((m) => m.recipeId!)).filter(Boolean),
+              shopping: () => shoppingSummary(todayPlan()?.active ?? null, stock, manualRows, priceRows),
+            }}
+            onOpenRecipe={(id) => setOpen(id)}
+            onOpenCart={() => { setAiOpen(false); onCart(); }}
+            onMark={async (meal, status) => {
+              const slot = todaySlots().find((s) => s.type === meal);
+              if (!slot) {
+                await writeEntry({ day: todayStr(), mealType: meal, status, recipeId: null, name: null, portions: 1, nutrition: null, offPlan: false, fromBatch: null, stockWrittenOff: false }, false);
+                return;
+              }
+              if (status === 'skipped') await skip(slot);
+              else await eat(slot, slot.recipeId!, 'eaten', slot.portions);
+            }}
           />
         )}
       </Sheet>
@@ -486,4 +526,23 @@ function customNutrition(kcal: number): NutrientTotals {
 function fmtP(p: number): string {
   const s = String(p).replace('.', ',');
   return `${s} ${p === 1 ? 'порция' : p < 5 && Number.isInteger(p) ? 'порции' : 'порций'}`;
+}
+
+function statusText(s?: string): string {
+  return s === 'eaten' ? 'съел' : s === 'replaced' ? 'заменил' : s === 'skipped' ? 'пропустил' : 'не отмечено';
+}
+
+/** Сводка корзины по выбранной неделе — те же правила, что на экране «Корзина». */
+function shoppingSummary(active: Day[] | null, stock: Map<string, number>, manualRows: Row[], priceRows: Row[]) {
+  if (!active) return { hasPlan: false, toBuy: 0, knownSum: 0, unpriced: 0, examples: [] as string[] };
+  const today = todayStr();
+  const planned = active.filter((d) => d.date >= today).flatMap((d) => d.meals.filter((m) => m.recipeId).map((m) => ({ recipeId: m.recipeId!, portions: m.portions })));
+  const prices = latestPrices(priceRows.map((r) => ({ ingredientId: String(r.ingredient_id), store: String(r.store), qty: Number(r.package_size), price: Number(r.price), date: String(r.price_date) })));
+  const list = buildShoppingList({
+    planned, recipes: RECIPE_MAP, ingredients: INGREDIENT_MAP, pantry: stock,
+    packages: packagesFor(INGREDIENTS.map((i) => i.id), PACK_SIZE, prices),
+    manual: manualRows.map((m) => ({ id: String(m.id), ingredientId: String(m.ingredient_id), amount: Number(m.amount), unit: m.unit as Unit })),
+  });
+  const lines = list.lines.filter((l) => l.toBuy > 0);
+  return { hasPlan: true, toBuy: lines.length, knownSum: list.knownCost, unpriced: list.unpriced, examples: lines.slice(0, 6).map((l) => l.name) };
 }
