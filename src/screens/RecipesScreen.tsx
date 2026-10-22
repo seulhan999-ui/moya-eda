@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { INGREDIENT_MAP, MEAL_LABEL, RECIPES } from '../catalog';
 import type { MealType } from '../core/types';
+import { matchesQuery } from '../catalog/search';
 import type { Recipe } from '../core/types';
 import { balances, type StockMovement } from '../core/stock';
 import { toBaseUnit } from '../core/units';
@@ -49,15 +50,13 @@ export function RecipesScreen({ session, owner }: { session: SyncSession; owner:
   const stock = useMemo(() => balances(moves.map(toMovement)), [moves]);
 
   const visible = useMemo(() => {
-    const q = query.trim().toLowerCase();
     const f = FILTERS.find((x) => x.id === filter)!;
     return RECIPES.filter((r) => {
       if (ratings.get(r.id)?.never_suggest) return false;
       if (r.ingredients.some((ri) => excluded.has(ri.ingredientId))) return false;
       if (meal !== 'all' && !r.mealTypes.includes(meal)) return false;
       if (!f.test(r, { ratings, stock })) return false;
-      if (!q) return true;
-      return r.name.toLowerCase().includes(q) || r.ingredients.some((ri) => INGREDIENT_MAP.get(ri.ingredientId)!.name.toLowerCase().includes(q));
+      return matchesQuery(r, query);
     });
   }, [query, filter, meal, ratings, excluded, stock]);
 
@@ -74,7 +73,7 @@ export function RecipesScreen({ session, owner }: { session: SyncSession; owner:
 
       <label className="search">
         <img src={iconUrl('Magnifying glass tilted left')} alt="" />
-        <input placeholder="Блюдо или продукт" value={query} onChange={(e) => setQuery(e.target.value)} />
+        <input placeholder="Продукт или блюдо: рыба, курица рис…" value={query} onChange={(e) => setQuery(e.target.value)} />
       </label>
       <div className="seg meals">
         {(['all', 'breakfast', 'lunch', 'dinner', 'snack'] as const).map((m) => (
