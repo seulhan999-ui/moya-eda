@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { startDemo, startSync, supabase, type SyncSession } from './data/client';
+import { CartScreen } from './screens/CartScreen';
 import { LoginScreen } from './screens/LoginScreen';
 import { MenuScreen } from './screens/MenuScreen';
 import { ProfileScreen } from './screens/ProfileScreen';
@@ -56,10 +57,7 @@ export default function App() {
           items={['Ход дня и карточка «Сейчас» с кнопкой «Съел»', 'Замена и пропуск блюда, еда вне плана', '«Приготовил» — списание продуктов из запасов']} />
       )}
       {tab === 'menu' && <MenuScreen session={sync} owner={userId} onCart={() => setTab('cart')} />}
-      {tab === 'cart' && (
-        <SoonScreen title="Корзина" script="покупки и запасы" icon="Basket" stage={5}
-          items={['Список покупок по отделам с упаковками', '«Куплено» с ценой из чека', 'Запасы «Есть дома» со сроками']} />
-      )}
+      {tab === 'cart' && <CartScreen session={sync} onMenu={() => setTab('menu')} />}
     </Shell>
   );
 }
