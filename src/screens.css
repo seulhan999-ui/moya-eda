@@ -177,3 +177,7 @@ select.input { appearance: none; -webkit-appearance: none; }
 .soon { margin-top: 20px; display: grid; justify-items: center; text-align: center; gap: 8px; padding: 26px 18px; }
 .soon b { font-size: 22px; }
 .soon ul { text-align: left; color: var(--on2); font-size: 14px; margin: 6px 0 0; padding-left: 20px; }
+.seg.meals { grid-template-columns: repeat(5, 1fr); margin-top: 12px; gap: 2px; }
+.seg.meals button { min-height: 42px; font-size: 13px; padding: 0 2px; }
+.info { border: 0; background: none; color: var(--copper-2); font-size: 15px; padding: 0 0 0 6px; min-height: 28px; }
+.info-text { margin: 4px 0 0; }

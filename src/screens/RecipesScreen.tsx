@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { INGREDIENT_MAP, MEAL_LABEL, RECIPES } from '../catalog';
+import type { MealType } from '../core/types';
 import type { Recipe } from '../core/types';
 import { balances, type StockMovement } from '../core/stock';
 import { toBaseUnit } from '../core/units';
@@ -20,10 +21,6 @@ const FILTERS: Filter[] = [
   { id: 'home', label: 'Из запасов', test: (r, c) => canCookFromStock(r, c.stock) },
   { id: 'nostove', label: 'Без плиты', test: (r) => r.equipment.every((e) => e === 'none' || e === 'microwave' || e === 'blender') },
   { id: 'fav', label: 'Избранное', test: (r, c) => !!c.ratings.get(r.id)?.favorite },
-  { id: 'breakfast', label: MEAL_LABEL.breakfast + 'и', test: (r) => r.mealTypes.includes('breakfast') },
-  { id: 'lunch', label: 'Обеды', test: (r) => r.mealTypes.includes('lunch') },
-  { id: 'dinner', label: 'Ужины', test: (r) => r.mealTypes.includes('dinner') },
-  { id: 'snack', label: 'Перекусы', test: (r) => r.mealTypes.includes('snack') },
   { id: 'economy', label: 'Экономно', test: (r) => r.modes.includes('economy') },
   { id: 'tasty', label: 'Вкусно и разнообразно', test: (r) => r.modes.includes('tasty') },
   { id: 'no_cook', label: 'Почти без готовки', test: (r) => r.modes.includes('no_cook') },
@@ -43,6 +40,7 @@ export function RecipesScreen({ session, owner }: { session: SyncSession; owner:
   const [moves] = useRows(session, 'stock_movements');
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState('all');
+  const [meal, setMeal] = useState<MealType | 'all'>('all');
   const [openId, setOpenId] = useState<string | null>(null);
   const [toast, showToast] = useToast();
 
@@ -56,11 +54,12 @@ export function RecipesScreen({ session, owner }: { session: SyncSession; owner:
     return RECIPES.filter((r) => {
       if (ratings.get(r.id)?.never_suggest) return false;
       if (r.ingredients.some((ri) => excluded.has(ri.ingredientId))) return false;
+      if (meal !== 'all' && !r.mealTypes.includes(meal)) return false;
       if (!f.test(r, { ratings, stock })) return false;
       if (!q) return true;
       return r.name.toLowerCase().includes(q) || r.ingredients.some((ri) => INGREDIENT_MAP.get(ri.ingredientId)!.name.toLowerCase().includes(q));
     });
-  }, [query, filter, ratings, excluded, stock]);
+  }, [query, filter, meal, ratings, excluded, stock]);
 
   const hiddenByExclusion = RECIPES.filter((r) => r.ingredients.some((ri) => excluded.has(ri.ingredientId))).length;
   const favCount = ratingRows.filter((r) => r.favorite).length;
@@ -77,6 +76,11 @@ export function RecipesScreen({ session, owner }: { session: SyncSession; owner:
         <img src={iconUrl('Magnifying glass tilted left')} alt="" />
         <input placeholder="Блюдо или продукт" value={query} onChange={(e) => setQuery(e.target.value)} />
       </label>
+      <div className="seg meals">
+        {(['all', 'breakfast', 'lunch', 'dinner', 'snack'] as const).map((m) => (
+          <button key={m} className={meal === m ? 'on' : ''} onClick={() => setMeal(m)}>{m === 'all' ? 'Все' : MEAL_LABEL[m]}</button>
+        ))}
+      </div>
       <div className="chips">
         {FILTERS.map((f) => (
           <button key={f.id} className={`pill-btn ${filter === f.id ? 'on' : ''}`} onClick={() => setFilter(f.id)}>{f.label}</button>

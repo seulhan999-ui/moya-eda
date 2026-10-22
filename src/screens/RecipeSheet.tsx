@@ -30,9 +30,10 @@ export function RecipeSheet({ recipe, session, owner, rating, stock, onClose, to
   const [portions, setPortions] = useState(1);
   const [photo, setPhoto] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [info, setInfo] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => setPortions(1), [recipe?.id]);
+  useEffect(() => { setPortions(1); setInfo(false); }, [recipe?.id]);
   useEffect(() => {
     setPhoto(null);
     const path = rating?.photo_path as string | undefined;
@@ -79,7 +80,7 @@ export function RecipeSheet({ recipe, session, owner, rating, stock, onClose, to
 
       <div className="r-kind">{recipe.mealTypes.map((m) => MEAL_LABEL[m]).join(' · ')}</div>
       <h2 className="r-title">{recipe.name}</h2>
-      <div className="r-src">{recipe.source} · проверено</div>
+      {recipe.source !== 'Каталог «Моя еда»' && <div className="r-src">{recipe.source}</div>}
 
       <div className="r-times">
         <div><b>{formatMinutes(recipe.timeTotalMin)}</b>всего</div>
@@ -105,9 +106,15 @@ export function RecipeSheet({ recipe, session, owner, rating, stock, onClose, to
         <div><b>{n(t.fiber.value)}</b>клетч., г</div>
       </div>
       <p className="nsrc">
-        На {String(portions).replace('.', ',')} {portions === 1 ? 'порцию' : portions < 5 ? 'порции' : 'порций'} · расчёт по ингредиентам, USDA FoodData Central
-        {estimate && '. Часть продуктов — оценка по ближайшему аналогу'}
+        на {String(portions).replace('.', ',')} {portions === 1 ? 'порцию' : portions < 5 ? 'порции' : 'порций'} · расчёт
+        <button className="info" aria-label="Как посчитано" onClick={() => setInfo((v) => !v)}>ⓘ</button>
       </p>
+      {info && (
+        <p className="note small info-text">
+          Посчитано по составу продуктов (база USDA FoodData Central).
+          {estimate && ' Для творога, сметаны, кефира и похожих продуктов — по ближайшему аналогу, поэтому цифры примерные.'}
+        </p>
+      )}
 
       <div className="h5">Ингредиенты</div>
       {recipe.ingredients.map((ri) => {
