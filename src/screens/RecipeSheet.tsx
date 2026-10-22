@@ -80,7 +80,6 @@ export function RecipeSheet({ recipe, session, owner, rating, stock, onClose, to
 
       <div className="r-kind">{recipe.mealTypes.map((m) => MEAL_LABEL[m]).join(' · ')}</div>
       <h2 className="r-title">{recipe.name}</h2>
-      {recipe.source !== 'Каталог «Моя еда»' && <div className="r-src">{recipe.source}</div>}
 
       <div className="r-times">
         <div><b>{formatMinutes(recipe.timeTotalMin)}</b>всего</div>
