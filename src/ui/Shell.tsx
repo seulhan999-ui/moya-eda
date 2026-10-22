@@ -27,14 +27,15 @@ export function useTab(): [Tab, (t: Tab) => void] {
   return [tab, (t) => { location.hash = `#/${t}`; window.scrollTo(0, 0); }];
 }
 
-export function Shell({ tab, onTab, children }: { tab: Tab; onTab: (t: Tab) => void; children: ReactNode }) {
+export function Shell({ tab, onTab, children, profileIcon = 'Person' }: { tab: Tab; onTab: (t: Tab) => void; children: ReactNode; profileIcon?: string }) {
+  const icon = (t: (typeof TABS)[number]) => (t.id === 'profile' ? profileIcon : t.icon);
   return (
     <div className="shell">
       <aside className="side">
         <div className="brand-side"><img src={iconUrl('Herb')} alt="" /><span>Моя еда</span></div>
         {TABS.map((t) => (
           <button key={t.id} className={tab === t.id ? 'on' : ''} onClick={() => onTab(t.id)}>
-            <img src={iconUrl(t.icon)} alt="" />{t.long}
+            <img src={iconUrl(icon(t))} alt="" />{t.long}
           </button>
         ))}
       </aside>
@@ -42,7 +43,7 @@ export function Shell({ tab, onTab, children }: { tab: Tab; onTab: (t: Tab) => v
       <nav className="tabbar" aria-label="Разделы">
         {TABS.map((t) => (
           <button key={t.id} className={tab === t.id ? 'on' : ''} onClick={() => onTab(t.id)}>
-            <img src={iconUrl(t.icon)} alt="" />{t.label}
+            <img src={iconUrl(icon(t))} alt="" />{t.label}
           </button>
         ))}
       </nav>

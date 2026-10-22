@@ -7,7 +7,7 @@ import { uuid } from '../data/ids';
 import type { Conflict } from '../data/localdb';
 import type { SyncStatus } from '../data/sync';
 import type { Row } from '../data/tables';
-import { iconUrl } from '../ui/icons';
+import { iconUrl, profileIcon } from '../ui/icons';
 import { Obj, Sheet, useRows, useToast } from '../ui/kit';
 
 const GOALS = [
@@ -87,7 +87,7 @@ export function ProfileScreen({ session, owner, email }: { session: SyncSession;
       </header>
 
       <section className="card row-card" style={{ marginTop: 18 }}>
-        <Obj name="Person" size={70} />
+        <Obj name={profileIcon(profile.sex)} size={70} />
         <div className="grow"><b className="serif">Цель</b><span className="note">Вкусно и полезно питаться</span></div>
       </section>
 

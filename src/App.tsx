@@ -8,6 +8,8 @@ import { ProfileScreen } from './screens/ProfileScreen';
 import { RecipesScreen } from './screens/RecipesScreen';
 import { TodayScreen } from './screens/TodayScreen';
 import { Shell, useTab } from './ui/Shell';
+import { profileIcon } from './ui/icons';
+import { useRows } from './ui/kit';
 
 export default function App() {
   const [session, setSession] = useState<Session | null | undefined>(undefined);
@@ -48,10 +50,15 @@ export default function App() {
   if (!demo && !session) return <LoginScreen />;
   if (!sync || !userId) return null;
 
+  return <Screens sync={sync} userId={userId} email={session?.user.email ?? 'демо-режим'} tab={tab} setTab={setTab} />;
+}
+
+function Screens({ sync, userId, email, tab, setTab }: { sync: SyncSession; userId: string; email: string; tab: ReturnType<typeof useTab>[0]; setTab: ReturnType<typeof useTab>[1] }) {
+  const [profiles] = useRows(sync, 'profiles');
   return (
-    <Shell tab={tab} onTab={setTab}>
+    <Shell tab={tab} onTab={setTab} profileIcon={profileIcon(profiles[0]?.sex)}>
       {tab === 'recipes' && <RecipesScreen session={sync} owner={userId} />}
-      {tab === 'profile' && <ProfileScreen session={sync} owner={userId} email={session?.user.email ?? 'демо-режим'} />}
+      {tab === 'profile' && <ProfileScreen session={sync} owner={userId} email={email} />}
       {tab === 'today' && <TodayScreen session={sync} owner={userId} onMenu={() => setTab('menu')} onCart={() => setTab('cart')} />}
       {tab === 'menu' && <MenuScreen session={sync} owner={userId} onCart={() => setTab('cart')} />}
       {tab === 'cart' && <CartScreen session={sync} onMenu={() => setTab('menu')} />}
