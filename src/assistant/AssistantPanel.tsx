@@ -24,6 +24,7 @@ const ERRORS: Record<string, string> = {
   network: 'Не удалось связаться с GigaChat. Проверьте интернет и попробуйте ещё раз.',
   upstream: 'GigaChat сейчас не отвечает. Попробуйте чуть позже.',
   auth: 'Войдите в приложение заново.',
+  not_deployed: 'Помощник ещё не размещён в Supabase (нет функции assistant).',
 };
 
 async function callAssistant(messages: ModelMsg[]): Promise<{ ok: true; content: string; function_call: { name: string; arguments: unknown } | null } | { ok: false; error: string }> {
@@ -31,7 +32,9 @@ async function callAssistant(messages: ModelMsg[]): Promise<{ ok: true; content:
   if (error) {
     let code = 'network';
     try {
-      const body = await (error as { context?: Response }).context?.json();
+      const ctx = (error as { context?: Response }).context;
+      if (ctx?.status === 404) code = 'not_deployed';
+      const body = await ctx?.json();
       code = body?.error ?? code;
     } catch { /* нет тела ответа */ }
     return { ok: false, error: code };
