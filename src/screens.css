@@ -310,3 +310,5 @@ select.input { appearance: none; -webkit-appearance: none; }
 .ai-input { position: sticky; bottom: 0; display: flex; gap: 8px; padding-top: 8px; background: #2a2525; }
 .ai-send { width: 54px; flex-shrink: 0; border: 0; border-radius: 16px; background: var(--copper); color: var(--coal); font-size: 20px; font-weight: 700; }
 .ai-send:disabled { opacity: 0.5; }
+
+.bubble p { white-space: pre-line; }

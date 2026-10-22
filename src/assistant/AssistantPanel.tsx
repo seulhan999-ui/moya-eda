@@ -25,22 +25,25 @@ const ERRORS: Record<string, string> = {
   network: 'Не удалось связаться с GigaChat. Проверьте интернет и попробуйте ещё раз.',
   upstream: 'GigaChat сейчас не отвечает. Попробуйте чуть позже.',
   auth: 'Войдите в приложение заново.',
+  oauth: 'GigaChat не принял ключ доступа. Возможно, ключ в секрете GIGACHAT_AUTH_KEY устарел или скопирован не полностью.',
   not_deployed: 'Помощник ещё не размещён в Supabase.',
 };
 
-async function callAssistant(messages: ModelMsg[]): Promise<{ ok: true; content: string; function_call: { name: string; arguments: unknown } | null } | { ok: false; error: string }> {
+async function callAssistant(messages: ModelMsg[]): Promise<{ ok: true; content: string; function_call: { name: string; arguments: unknown } | null } | { ok: false; error: string; detail?: string }> {
   const { data, error } = await supabase.functions.invoke(ASSISTANT_FUNCTION, { body: { messages, functions: FUNCTIONS } });
   if (error) {
     let code = 'network';
+    let detail: string | undefined;
     try {
       const ctx = (error as { context?: Response }).context;
       if (ctx?.status === 404) code = 'not_deployed';
       const body = await ctx?.json();
       code = body?.error ?? code;
+      detail = body?.detail;
     } catch { /* нет тела ответа */ }
-    return { ok: false, error: code };
+    return { ok: false, error: code, detail };
   }
-  if (!data?.ok) return { ok: false, error: data?.error ?? 'upstream' };
+  if (!data?.ok) return { ok: false, error: data?.error ?? 'upstream', detail: data?.detail };
   return { ok: true, content: data.message.content ?? '', function_call: data.message.function_call };
 }
 
@@ -73,7 +76,7 @@ export function AssistantPanel({ ctx, today, todayMeals, exclusions, onOpenRecip
     try {
       const r1 = await callAssistant(msgs);
       if (!r1.ok) {
-        setBubbles((b) => [...b, { who: 'ai', text: ERRORS[r1.error] ?? ERRORS.upstream }]);
+        setBubbles((b) => [...b, { who: 'ai', text: (ERRORS[r1.error] ?? ERRORS.upstream) + (r1.detail ? `\n\nТехническая причина: ${r1.detail}` : ` (код: ${r1.error})`) }]);
         return;
       }
       let result: ToolResult | undefined;

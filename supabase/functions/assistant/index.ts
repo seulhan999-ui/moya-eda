@@ -73,7 +73,7 @@ async function gigaToken(): Promise<string> {
     headers: { Authorization: `Basic ${key.trim()}`, RqUID: crypto.randomUUID(), 'Content-Type': 'application/x-www-form-urlencoded', Accept: 'application/json' },
     body: 'scope=GIGACHAT_API_PERS',
   }));
-  if (!res.ok) throw new Error(`oauth_${res.status}`);
+  if (!res.ok) throw new Error(`oauth_${res.status}: ${(await res.text()).slice(0, 200)}`);
   const data = await res.json();
   token = { value: data.access_token, until: Number(data.expires_at) || Date.now() + 25 * 60_000 };
   return token.value;
@@ -119,12 +119,13 @@ Deno.serve(async (req) => {
     if (!res.ok) {
       const text = await res.text();
       const limit = res.status === 402 || res.status === 429 || /limit|quota|payment/i.test(text);
-      return json({ ok: false, error: limit ? 'limit' : 'upstream', status: res.status }, 502);
+      return json({ ok: false, error: limit ? 'limit' : 'upstream', detail: `GigaChat ${res.status}: ${text.slice(0, 300)}` }, 502);
     }
     const data = await res.json();
     const msg = data.choices?.[0]?.message ?? {};
     return json({ ok: true, message: { content: msg.content ?? '', function_call: msg.function_call ?? null }, usage: data.usage });
   } catch (e) {
-    return json({ ok: false, error: String((e as Error).message ?? e).startsWith('no_key') ? 'no_key' : 'network' }, 502);
+    const m = String((e as Error).message ?? e);
+    return json({ ok: false, error: m.startsWith('no_key') ? 'no_key' : m.startsWith('oauth_') ? 'oauth' : 'network', detail: m.slice(0, 300), tls: client ? 'cert' : 'no-cert' }, 502);
   }
 });
